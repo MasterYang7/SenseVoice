@@ -203,10 +203,24 @@ class OrtInferSession:
         cpu_provider_options = {
             "arena_extend_strategy": "kSameAsRequested",
         }
+        npu_ep = "CANNExecutionProvider"
+
+        npu_provider_options = {
+                "device_id": device_id,
+                "arena_extend_strategy": "kNextPowerOfTwo",
+                "npu_mem_limit": 2 * 1024 * 1024 * 1024,
+                "op_select_impl_mode": "high_performance",
+                "optypelist_for_implmode": "Gelu",
+                "enable_cann_graph": True
+        }
+        
 
         EP_list = []
         if device_id != "-1" and get_device() == "GPU" and cuda_ep in get_available_providers():
             EP_list = [(cuda_ep, cuda_provider_options)]
+        if device_id != "-1" and get_device() == "NPU":
+            EP_list = [(npu_ep, npu_provider_options)]
+        
         EP_list.append((cpu_ep, cpu_provider_options))
 
         self._verify_model(model_file)
