@@ -125,7 +125,7 @@ class MultiHeadedAttentionSANM(nn.Module):
     def forward_fsmn(self, inputs, mask, mask_shfit_chunk=None):
         b, t, d = inputs.size()
         if mask is not None:
-            mask = torch.reshape(mask, (b, -1, 1))
+            mask = torch.reshape(mask, (b, -1, 1)).to('npu')
             if mask_shfit_chunk is not None:
                 mask = mask * mask_shfit_chunk
             inputs = inputs * mask
@@ -157,13 +157,13 @@ class MultiHeadedAttentionSANM(nn.Module):
         b, t, d = x.size()
         q_k_v = self.linear_q_k_v(x)
         q, k, v = torch.split(q_k_v, int(self.h * self.d_k), dim=-1)
-        q_h = torch.reshape(q, (b, t, self.h, self.d_k)).transpose(
+        q_h = torch.reshape(q, (b, t, self.h, self.d_k)).to('npu').transpose(
             1, 2
         )  # (batch, head, time1, d_k)
-        k_h = torch.reshape(k, (b, t, self.h, self.d_k)).transpose(
+        k_h = torch.reshape(k, (b, t, self.h, self.d_k)).to('npu').transpose(
             1, 2
         )  # (batch, head, time2, d_k)
-        v_h = torch.reshape(v, (b, t, self.h, self.d_k)).transpose(
+        v_h = torch.reshape(v, (b, t, self.h, self.d_k)).to('npu').transpose(
             1, 2
         )  # (batch, head, time2, d_k)
 
@@ -247,11 +247,11 @@ class MultiHeadedAttentionSANM(nn.Module):
             if cache is not None:
                 k_h_stride = k_h[:, :, : -(chunk_size[2]), :]
                 v_h_stride = v_h[:, :, : -(chunk_size[2]), :]
-                k_h = torch.cat((cache["k"], k_h), dim=2)
-                v_h = torch.cat((cache["v"], v_h), dim=2)
+                k_h = torch.cat((cache["k"], k_h), dim=2).to('npu')
+                v_h = torch.cat((cache["v"], v_h), dim=2).to('npu')
 
-                cache["k"] = torch.cat((cache["k"], k_h_stride), dim=2)
-                cache["v"] = torch.cat((cache["v"], v_h_stride), dim=2)
+                cache["k"] = torch.cat((cache["k"], k_h_stride), dim=2).to('npu')
+                cache["v"] = torch.cat((cache["v"], v_h_stride), dim=2).to('npu')
                 if look_back != -1:
                     cache["k"] = cache["k"][:, :, -(look_back * chunk_size[1]) :, :]
                     cache["v"] = cache["v"][:, :, -(look_back * chunk_size[1]) :, :]
@@ -345,7 +345,7 @@ class EncoderLayerSANM(nn.Module):
 
         if skip_layer:
             if cache is not None:
-                x = torch.cat([cache, x], dim=1)
+                x = torch.cat([cache, x], dim=1).to('npu')
             return x, mask
 
         residual = x
@@ -364,7 +364,7 @@ class EncoderLayerSANM(nn.Module):
                     ),
                 ),
                 dim=-1,
-            )
+            ).to('npu')
             if self.in_size == self.size:
                 x = residual + stoch_layer_coeff * self.concat_linear(x_concat)
             else:
@@ -735,7 +735,7 @@ class SenseVoiceSmall(nn.Module):
         
         styles = torch.LongTensor([[self.textnorm_int_dict[int(style)]] for style in text[:, 3]]).to(speech.device)
         style_query = self.embed(styles)
-        speech = torch.cat((style_query, speech), dim=1)
+        speech = torch.cat((style_query, speech), dim=1).to('npu')
         speech_lengths += 1
 
         event_emo_query = self.embed(torch.LongTensor([[1, 2]]).to(speech.device)).repeat(speech.size(0), 1, 1)
@@ -840,14 +840,14 @@ class SenseVoiceSmall(nn.Module):
         textnorm_query = self.embed(
             torch.LongTensor([[self.textnorm_dict[textnorm]]]).to(speech.device)
         ).repeat(speech.size(0), 1, 1)
-        speech = torch.cat((textnorm_query, speech), dim=1)
+        speech = torch.cat((textnorm_query, speech), dim=1).to('npu')
         speech_lengths += 1
 
         event_emo_query = self.embed(torch.LongTensor([[1, 2]]).to(speech.device)).repeat(
             speech.size(0), 1, 1
         )
-        input_query = torch.cat((language_query, event_emo_query), dim=1)
-        speech = torch.cat((input_query, speech), dim=1)
+        input_query = torch.cat((language_query, event_emo_query), dim=1).to('npu')
+        speech = torch.cat((input_query, speech), dim=1).to('npu')
         speech_lengths += 3
 
         # Encoder
