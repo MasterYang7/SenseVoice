@@ -28,22 +28,23 @@ class SinusoidalPositionEncoder(torch.nn.Module):
         batch_size = positions.size(0)
         positions = positions.type(dtype)
         device = positions.device
+        print('驱动版本',device)
         log_timescale_increment = torch.log(torch.tensor([10000], dtype=dtype, device=device)) / (
             depth / 2 - 1
         )
         inv_timescales = torch.exp(
             torch.arange(depth / 2, device=device).type(dtype) * (-log_timescale_increment)
-        )
-        inv_timescales = torch.reshape(inv_timescales, [batch_size, -1])
-        scaled_time = torch.reshape(positions, [1, -1, 1]) * torch.reshape(
+        ).to('npu')
+        inv_timescales = torch.reshape(inv_timescales, [batch_size, -1]).to('npu')
+        scaled_time = torch.reshape(positions, [1, -1, 1]).to('npu') * torch.reshape(
             inv_timescales, [1, 1, -1]
-        )
-        encoding = torch.cat([torch.sin(scaled_time), torch.cos(scaled_time)], dim=2)
+        ).to('npu')
+        encoding = torch.cat([torch.sin(scaled_time), torch.cos(scaled_time)], dim=2).to('npu')
         return encoding.type(dtype)
 
     def forward(self, x):
         batch_size, timesteps, input_dim = x.size()
-        positions = torch.arange(1, timesteps + 1, device=x.device)[None, :]
+        positions = torch.arange(1, timesteps + 1, device=x.device).to('npu')[None, :]
         position_encoding = self.encode(positions, input_dim, x.dtype).to(x.device)
 
         return x + position_encoding
@@ -154,16 +155,16 @@ class MultiHeadedAttentionSANM(nn.Module):
         """
         b, t, d = x.size()
         q_k_v = self.linear_q_k_v(x)
-        q, k, v = torch.split(q_k_v, int(self.h * self.d_k), dim=-1)
+        q, k, v = torch.split(q_k_v, int(self.h * self.d_k), dim=-1).to('npu')
         q_h = torch.reshape(q, (b, t, self.h, self.d_k)).transpose(
             1, 2
-        )  # (batch, head, time1, d_k)
+        ).to('npu')  # (batch, head, time1, d_k)
         k_h = torch.reshape(k, (b, t, self.h, self.d_k)).transpose(
             1, 2
-        )  # (batch, head, time2, d_k)
+        ).to('npu')  # (batch, head, time2, d_k)
         v_h = torch.reshape(v, (b, t, self.h, self.d_k)).transpose(
             1, 2
-        )  # (batch, head, time2, d_k)
+        ).to('npu')  # (batch, head, time2, d_k)
 
         return q_h, k_h, v_h, v
 
