@@ -214,6 +214,7 @@ class OrtInferSession:
                 "enable_cann_graph": True
         }
         
+        print('获取驱动',get_device(),'获取驱动信息',get_available_providers())
 
         EP_list = []
         if device_id != "-1" and get_device() == "GPU" and cuda_ep in get_available_providers():
