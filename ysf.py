@@ -12,6 +12,7 @@ model = AutoModel(
     vad_kwargs={"max_single_segment_time": 30000},
     device="npu:3",
 )
+model.to("npu:3")
 
 # en
 res = model.generate(
