@@ -843,7 +843,7 @@ class SenseVoiceSmall(nn.Module):
         speech = torch.cat((textnorm_query, speech), dim=1).to('npu')
         speech_lengths += 1
 
-        event_emo_query = self.embed(torch.LongTensor([[1, 2]]).to(speech.device)).repeat(
+        event_emo_query = self.embed(torch.LongTensor([[1, 2]]).to('npu')).repeat(
             speech.size(0), 1, 1
         )
         input_query = torch.cat((language_query, event_emo_query), dim=1).to('npu')
