@@ -3,7 +3,7 @@ import torch_npu
 from funasr.utils.postprocess_utils import rich_transcription_postprocess
 
 model_dir = "iic/SenseVoiceSmall"
-
+torch_npu.npu.set_device("npu:3")
 
 model = AutoModel(
     model=model_dir,
