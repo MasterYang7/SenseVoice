@@ -1,8 +1,9 @@
 from funasr import AutoModel
+import torch_npu
 from funasr.utils.postprocess_utils import rich_transcription_postprocess
 
 model_dir = "iic/SenseVoiceSmall"
-
+torch_npu.init()
 
 model = AutoModel(
     model=model_dir,
