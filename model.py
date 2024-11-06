@@ -156,7 +156,7 @@ class MultiHeadedAttentionSANM(nn.Module):
         """
         b, t, d = x.size()
         q_k_v = self.linear_q_k_v(x)
-        q, k, v = torch.split(q_k_v, int(self.h * self.d_k), dim=-1).to('npu')
+        q, k, v = torch.split(q_k_v, int(self.h * self.d_k), dim=-1)
         q_h = torch.reshape(q, (b, t, self.h, self.d_k)).transpose(
             1, 2
         ).to('npu')  # (batch, head, time1, d_k)
