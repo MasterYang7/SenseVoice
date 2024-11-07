@@ -123,6 +123,7 @@ class MultiHeadedAttentionSANM(nn.Module):
         device = torch.device("npu:0") if torch.npu.is_available() else torch.device("cpu")
         start_time = time.perf_counter()
         b, t, d = inputs.size()
+        inputs = inputs.to(device)
         if mask is not None:
             mask = torch.reshape(mask, (b, -1, 1)).to(device)
             if mask_shfit_chunk is not None:
