@@ -364,7 +364,7 @@ class EncoderLayerSANM(nn.Module):
                     ),
                 ),
                 dim=-1,
-            ).to('npu')
+            )
             if self.in_size == self.size:
                 x = residual + stoch_layer_coeff * self.concat_linear(x_concat)
             else:
@@ -735,7 +735,7 @@ class SenseVoiceSmall(nn.Module):
         
         styles = torch.LongTensor([[self.textnorm_int_dict[int(style)]] for style in text[:, 3]]).to(speech.device)
         style_query = self.embed(styles)
-        speech = torch.cat((style_query, speech), dim=1).to('npu')
+        speech = torch.cat((style_query, speech), dim=1)
         speech_lengths += 1
 
         event_emo_query = self.embed(torch.LongTensor([[1, 2]]).to(speech.device)).repeat(speech.size(0), 1, 1)
