@@ -17,7 +17,7 @@ model = AutoModel(
 
 # en
 res = model.generate(
-    input=f"{model.model_path}/example/en.mp3",
+    input="./ysf.wav",
     cache={},
     language="auto",  # "zh", "en", "yue", "ja", "ko", "nospeech"
     use_itn=True,
