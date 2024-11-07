@@ -120,17 +120,19 @@ class MultiHeadedAttentionSANM(nn.Module):
         self.pad_fn = nn.ConstantPad1d((left_padding, right_padding), 0.0)
 
     def forward_fsmn(self, inputs, mask, mask_shfit_chunk=None):
+        device = torch.device("npu:0") if torch.npu.is_available() else torch.device("cpu")
         start_time = time.perf_counter()
         b, t, d = inputs.size()
         if mask is not None:
-            mask = torch.reshape(mask, (b, -1, 1))
+            mask = torch.reshape(mask, (b, -1, 1)).to(device)
             if mask_shfit_chunk is not None:
+                mask_shfit_chunk=mask_shfit_chunk.to(device)
                 mask = mask * mask_shfit_chunk
             inputs = inputs * mask
             print(f"inputs shape: {inputs}")
             print(f"mask shape: {mask}")
 
-        x = inputs.transpose(1, 2)
+        x = inputs.transpose(1, 2).to(device)
         x = self.pad_fn(x)
         x = self.fsmn_block(x)
         x = x.transpose(1, 2)
