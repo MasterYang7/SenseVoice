@@ -240,6 +240,7 @@ class MultiHeadedAttentionSANM(nn.Module):
 
         """
         q_h, k_h, v_h, v = self.forward_qkv(x)
+        print(f"mask shape 2: {mask.shape}")
         fsmn_memory = self.forward_fsmn(v, mask, mask_shfit_chunk)
         q_h = q_h * self.d_k ** (-0.5)
         scores = torch.matmul(q_h, k_h.transpose(-2, -1))
