@@ -125,7 +125,7 @@ class MultiHeadedAttentionSANM(nn.Module):
     def forward_fsmn(self, inputs, mask, mask_shfit_chunk=None):
         b, t, d = inputs.size()
         if mask is not None:
-            mask = torch.reshape(mask, (b, -1, 1)).to('npu')
+            mask = torch.reshape(mask, (b, -1, 1))
             if mask_shfit_chunk is not None:
                 mask = mask * mask_shfit_chunk
             print(f"inputs shape: {inputs.shape}")
