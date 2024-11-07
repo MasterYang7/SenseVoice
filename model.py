@@ -249,11 +249,11 @@ class MultiHeadedAttentionSANM(nn.Module):
             if cache is not None:
                 k_h_stride = k_h[:, :, : -(chunk_size[2]), :]
                 v_h_stride = v_h[:, :, : -(chunk_size[2]), :]
-                k_h = torch.cat((cache["k"], k_h), dim=2).to('npu')
-                v_h = torch.cat((cache["v"], v_h), dim=2).to('npu')
+                k_h = torch.cat((cache["k"], k_h), dim=2)
+                v_h = torch.cat((cache["v"], v_h), dim=2)
 
-                cache["k"] = torch.cat((cache["k"], k_h_stride), dim=2).to('npu')
-                cache["v"] = torch.cat((cache["v"], v_h_stride), dim=2).to('npu')
+                cache["k"] = torch.cat((cache["k"], k_h_stride), dim=2)
+                cache["v"] = torch.cat((cache["v"], v_h_stride), dim=2)
                 if look_back != -1:
                     cache["k"] = cache["k"][:, :, -(look_back * chunk_size[1]) :, :]
                     cache["v"] = cache["v"][:, :, -(look_back * chunk_size[1]) :, :]
