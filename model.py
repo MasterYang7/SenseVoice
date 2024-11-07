@@ -27,9 +27,7 @@ class SinusoidalPositionEncoder(torch.nn.Module):
     ):
         batch_size = positions.size(0)
         positions = positions.type(dtype)
-        positions= positions.to('npu')
         device = positions.device
-        print('驱动版本',positions)
         log_timescale_increment = torch.log(torch.tensor([10000], dtype=dtype, device=device)) / (
             depth / 2 - 1
         )
@@ -39,14 +37,14 @@ class SinusoidalPositionEncoder(torch.nn.Module):
         inv_timescales = torch.reshape(inv_timescales, [batch_size, -1])
         scaled_time = torch.reshape(positions, [1, -1, 1]) * torch.reshape(
             inv_timescales, [1, 1, -1]
-        ).to('npu')
+        )
         encoding = torch.cat([torch.sin(scaled_time), torch.cos(scaled_time)], dim=2)
         return encoding.type(dtype)
 
     def forward(self, x):
         batch_size, timesteps, input_dim = x.size()
         positions = torch.arange(1, timesteps + 1, device=x.device)[None, :]
-        position_encoding = self.encode(positions.to('npu'), input_dim, x.dtype).to(x.device)
+        position_encoding = self.encode(positions, input_dim, x.dtype).to(x.device)
 
         return x + position_encoding
 
@@ -128,24 +126,6 @@ class MultiHeadedAttentionSANM(nn.Module):
             mask = torch.reshape(mask, (b, -1, 1))
             if mask_shfit_chunk is not None:
                 mask = mask * mask_shfit_chunk
-           
-            if inputs.shape[1] > mask.shape[1]:
-            # 填充 mask 使其与 inputs 一致
-                mask = F.pad(mask, (1, inputs.shape[1] - mask.shape[1]), value=0)
-                
-            elif inputs.shape[1] < mask.shape[1]:
-                # 填充 inputs 使其与 mask 一致
-                inputs = F.pad(inputs, (0, mask.shape[1] - inputs.shape[1]), value=0)
-            if inputs.shape[2] > mask.shape[2]:
-        # 填充 mask 使其与 inputs 一致
-                mask = F.pad(mask, (0, inputs.shape[2] - mask.shape[2]), value=0)
-                
-            elif inputs.shape[2] < mask.shape[2]:
-                # 填充 inputs 使其与 mask 一致
-                inputs = F.pad(inputs, (0, mask.shape[2] - inputs.shape[2]), value=0)
-
-            print(f"inputs shape: {inputs.shape}")
-            print(f"mask shape: {mask.shape}")
             inputs = inputs * mask
 
         x = inputs.transpose(1, 2)
@@ -758,8 +738,7 @@ class SenseVoiceSmall(nn.Module):
 
         event_emo_query = self.embed(torch.LongTensor([[1, 2]]).to(speech.device)).repeat(speech.size(0), 1, 1)
         input_query = torch.cat((language_query, event_emo_query), dim=1)
-        input_quer = input_query
-        speech = torch.cat((input_quer, speech), dim=1)
+        speech = torch.cat((input_query, speech), dim=1)
         speech_lengths += 3
 
         encoder_out, encoder_out_lens = self.encoder(speech, speech_lengths)
@@ -845,7 +824,7 @@ class SenseVoiceSmall(nn.Module):
         speech_lengths = speech_lengths.to(device=kwargs["device"])
 
         language = kwargs.get("language", "auto")
-        language_query = self.embed(    
+        language_query = self.embed(
             torch.LongTensor(
                 [[self.lid_dict[language] if language in self.lid_dict else 0]]
             ).to(speech.device)
@@ -859,6 +838,7 @@ class SenseVoiceSmall(nn.Module):
             torch.LongTensor([[self.textnorm_dict[textnorm]]]).to(speech.device)
         ).repeat(speech.size(0), 1, 1)
         speech = torch.cat((textnorm_query, speech), dim=1)
+        speech_lengths += 1
 
         event_emo_query = self.embed(torch.LongTensor([[1, 2]]).to(speech.device)).repeat(
             speech.size(0), 1, 1
