@@ -3,7 +3,6 @@ import time
 import torch
 from torch import nn
 import torch.nn.functional as F
-import torch_npu
 from typing import Iterable, Optional
 
 from funasr.register import tables
@@ -134,8 +133,10 @@ class MultiHeadedAttentionSANM(nn.Module):
         x = x.transpose(1, 2)
         x += inputs
         x = self.dropout(x)
+        print(f"xxx shape: {x.shape}")
         if mask is not None:
             x = x * mask
+            print(f"x shape: {x.shape}")
         return x
 
     def forward_qkv(self, x):

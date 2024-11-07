@@ -1,9 +1,9 @@
 from funasr import AutoModel
-import torch_npu
+# import torch_npu
 from funasr.utils.postprocess_utils import rich_transcription_postprocess
 
 model_dir = "iic/SenseVoiceSmall"
-torch_npu.npu.set_device("npu:0")
+# torch_npu.npu.set_device("npu:0")
 
 model = AutoModel(
     model=model_dir,
@@ -11,7 +11,7 @@ model = AutoModel(
     remote_code="./model.py",  
     vad_model="fsmn-vad",
     vad_kwargs={"max_single_segment_time": 30000},
-    device="npu:0",
+    device="cpu",
 )
 #model.to("npu:3")
 
