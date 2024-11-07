@@ -312,7 +312,7 @@ class LayerNorm(nn.LayerNorm):
 
 def sequence_mask(lengths, maxlen=None, dtype=torch.float32, device=None):
     if maxlen is None:
-        maxlen = 110
+        maxlen = lengths.max
     print(f"maxlen: {maxlen}")
     print(f"maxlen: {lengths}")
     row_vector = torch.arange(0, maxlen, 1).to(lengths.device)
