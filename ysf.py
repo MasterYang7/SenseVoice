@@ -2,7 +2,7 @@ from funasr import AutoModel
 import torch_npu
 from funasr.utils.postprocess_utils import rich_transcription_postprocess
 
-model_dir = "iic/SenseVoiceSmall"
+model_dir = "./model.pt"
 torch_npu.npu.set_device("npu:0")
 
 model = AutoModel(
@@ -11,13 +11,13 @@ model = AutoModel(
     remote_code="./model.py",  
     vad_model="fsmn-vad",
     vad_kwargs={"max_single_segment_time": 30000},
-    device="npu:0",
+    device="gpu:0",
 )
 #model.to("npu:3")
 
 # en
 res = model.generate(
-    input=f"{model.model_path}/example/en.mp3",
+    input="./ysf.wav",
     cache={},
     language="auto",  # "zh", "en", "yue", "ja", "ko", "nospeech"
     use_itn=True,
