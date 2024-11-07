@@ -27,8 +27,8 @@ class SinusoidalPositionEncoder(torch.nn.Module):
     ):
         batch_size = positions.size(0)
         positions = positions.type(dtype)
+        positions= positions.to('npu')
         device = positions.device
-        device = 'npu'
         print('驱动版本',positions)
         log_timescale_increment = torch.log(torch.tensor([10000], dtype=dtype, device=device)) / (
             depth / 2 - 1
