@@ -35,11 +35,11 @@ class SinusoidalPositionEncoder(torch.nn.Module):
         )
         inv_timescales = torch.exp(
             torch.arange(depth / 2, device=device).type(dtype) * (-log_timescale_increment)
-        ).to('npu')
-        inv_timescales = torch.reshape(inv_timescales, [batch_size, -1]).to('npu')
-        scaled_time = torch.reshape(positions, [1, -1, 1]).to('npu') * torch.reshape(
+        )
+        inv_timescales = torch.reshape(inv_timescales, [batch_size, -1])
+        scaled_time = torch.reshape(positions, [1, -1, 1]) * torch.reshape(
             inv_timescales, [1, 1, -1]
-        ).to('npu')
+        )
         encoding = torch.cat([torch.sin(scaled_time), torch.cos(scaled_time)], dim=2)
         return encoding.type(dtype)
 
@@ -159,13 +159,13 @@ class MultiHeadedAttentionSANM(nn.Module):
         b, t, d = x.size()
         q_k_v = self.linear_q_k_v(x)
         q, k, v = torch.split(q_k_v, int(self.h * self.d_k), dim=-1)
-        q_h = torch.reshape(q, (b, t, self.h, self.d_k)).to('npu').transpose(
+        q_h = torch.reshape(q, (b, t, self.h, self.d_k)).transpose(
             1, 2
         )  # (batch, head, time1, d_k)
-        k_h = torch.reshape(k, (b, t, self.h, self.d_k)).to('npu').transpose(
+        k_h = torch.reshape(k, (b, t, self.h, self.d_k)).transpose(
             1, 2
         )  # (batch, head, time2, d_k)
-        v_h = torch.reshape(v, (b, t, self.h, self.d_k)).to('npu').transpose(
+        v_h = torch.reshape(v, (b, t, self.h, self.d_k)).transpose(
             1, 2
         )  # (batch, head, time2, d_k)
 
@@ -742,7 +742,7 @@ class SenseVoiceSmall(nn.Module):
 
         event_emo_query = self.embed(torch.LongTensor([[1, 2]]).to(speech.device)).repeat(speech.size(0), 1, 1)
         input_query = torch.cat((language_query, event_emo_query), dim=1)
-        input_quer = input_query.to('npu')
+        input_quer = input_query
         speech = torch.cat((input_quer, speech), dim=1)
         speech_lengths += 3
 
