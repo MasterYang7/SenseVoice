@@ -1,7 +1,7 @@
 from funasr import AutoModel
 from funasr.utils.postprocess_utils import rich_transcription_postprocess
 
-model_dir = "/data/v1"
+model_dir = "/data/v1/model.pt"
 
 model = AutoModel(
     model=model_dir,
