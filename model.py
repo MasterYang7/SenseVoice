@@ -40,7 +40,7 @@ class SinusoidalPositionEncoder(torch.nn.Module):
         scaled_time = torch.reshape(positions, [1, -1, 1]).to('npu') * torch.reshape(
             inv_timescales, [1, 1, -1]
         ).to('npu')
-        encoding = torch.cat([torch.sin(scaled_time), torch.cos(scaled_time)], dim=2).to('npu')
+        encoding = torch.cat([torch.sin(scaled_time), torch.cos(scaled_time)], dim=2)
         return encoding.type(dtype)
 
     def forward(self, x):
@@ -345,7 +345,7 @@ class EncoderLayerSANM(nn.Module):
 
         if skip_layer:
             if cache is not None:
-                x = torch.cat([cache, x], dim=1).to('npu')
+                x = torch.cat([cache, x], dim=1)
             return x, mask
 
         residual = x
@@ -741,7 +741,7 @@ class SenseVoiceSmall(nn.Module):
         event_emo_query = self.embed(torch.LongTensor([[1, 2]]).to(speech.device)).repeat(speech.size(0), 1, 1)
         input_query = torch.cat((language_query, event_emo_query), dim=1)
         input_quer = input_query.to('npu')
-        speech = torch.cat((input_quer, speech), dim=1).to("npu")
+        speech = torch.cat((input_quer, speech), dim=1)
         speech_lengths += 3
 
         encoder_out, encoder_out_lens = self.encoder(speech, speech_lengths)
