@@ -125,24 +125,6 @@ class MultiHeadedAttentionSANM(nn.Module):
         b, t, d = inputs.size()
         if mask is not None:
             mask = torch.reshape(mask, (b, -1, 1))
-            if mask_shfit_chunk is not None:
-                mask = mask * mask_shfit_chunk
-           
-            if inputs.shape[1] > mask.shape[1]:
-            # 填充 mask 使其与 inputs 一致
-                mask = F.pad(mask, (1, inputs.shape[1] - mask.shape[1]), value=0)
-                
-            elif inputs.shape[1] < mask.shape[1]:
-                # 填充 inputs 使其与 mask 一致
-                inputs = F.pad(inputs, (0, mask.shape[1] - inputs.shape[1]), value=0)
-            if inputs.shape[2] > mask.shape[2]:
-        # 填充 mask 使其与 inputs 一致
-                mask = F.pad(mask, (0, inputs.shape[2] - mask.shape[2]), value=0)
-                
-            elif inputs.shape[2] < mask.shape[2]:
-                # 填充 inputs 使其与 mask 一致
-                inputs = F.pad(inputs, (0, mask.shape[2] - inputs.shape[2]), value=0)
-
             print(f"inputs shape: {inputs.shape}")
             print(f"mask shape: {mask.shape}")
             inputs = inputs * mask
@@ -310,7 +292,7 @@ class LayerNorm(nn.LayerNorm):
 
 def sequence_mask(lengths, maxlen=None, dtype=torch.float32, device=None):
     if maxlen is None:
-        maxlen = 110
+        maxlen = lengths.max
     print(f"maxlen: {maxlen}")
     print(f"maxlen: {lengths}")
     row_vector = torch.arange(0, maxlen, 1).to(lengths.device)
