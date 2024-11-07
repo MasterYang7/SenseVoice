@@ -313,9 +313,13 @@ class LayerNorm(nn.LayerNorm):
 def sequence_mask(lengths, maxlen=None, dtype=torch.float32, device=None):
     if maxlen is None:
         maxlen = lengths.max()
+    print(f"maxlen: {maxlen}")
+    print(f"maxlen: {lengths}")
     row_vector = torch.arange(0, maxlen, 1).to(lengths.device)
     matrix = torch.unsqueeze(lengths, dim=-1)
+    print(f"maxlen: {matrix}")
     mask = row_vector < matrix
+    print(f"mask sequence_mask 1: {mask.shape}")
     mask = mask.detach()
     print(f"mask sequence_mask 2: {mask.shape}")
     return mask.type(dtype).to(device) if device is not None else mask.type(dtype)
