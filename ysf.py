@@ -8,7 +8,7 @@ torch_npu.npu.set_device("npu:0")
 model = AutoModel(
     model=model_dir,
     trust_remote_code=True,
-    remote_code="./model.py",  
+    remote_code="./modelgpu.py",  
     vad_model="fsmn-vad",
     vad_kwargs={"max_single_segment_time": 30000},
     device="npu:0",
