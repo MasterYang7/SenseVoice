@@ -120,6 +120,7 @@ class MultiHeadedAttentionSANM(nn.Module):
         self.pad_fn = nn.ConstantPad1d((left_padding, right_padding), 0.0)
 
     def forward_fsmn(self, inputs, mask, mask_shfit_chunk=None):
+        start_time = time.perf_counter()
         b, t, d = inputs.size()
         if mask is not None:
             mask = torch.reshape(mask, (b, -1, 1))
@@ -137,6 +138,10 @@ class MultiHeadedAttentionSANM(nn.Module):
         if mask is not None:
             x = x * mask
             print(f"x shape: {x.shape}")
+        end_time = time.perf_counter()
+        # 计算运行时间
+        execution_time = end_time - start_time
+        print(f"代码运行时间: {execution_time} 秒")
         return x
 
     def forward_qkv(self, x):
