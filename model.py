@@ -128,6 +128,8 @@ class MultiHeadedAttentionSANM(nn.Module):
             mask = torch.reshape(mask, (b, -1, 1)).to('npu')
             if mask_shfit_chunk is not None:
                 mask = mask * mask_shfit_chunk
+            print(f"inputs shape: {inputs.shape}")
+            print(f"mask shape: {mask.shape}")
             inputs = inputs * mask
 
         x = inputs.transpose(1, 2)
