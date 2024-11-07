@@ -317,7 +317,7 @@ def sequence_mask(lengths, maxlen=None, dtype=torch.float32, device=None):
     matrix = torch.unsqueeze(lengths, dim=-1)
     mask = row_vector < matrix
     mask = mask.detach()
-
+    print(f"mask sequence_mask 2: {mask.shape}")
     return mask.type(dtype).to(device) if device is not None else mask.type(dtype)
 
 
