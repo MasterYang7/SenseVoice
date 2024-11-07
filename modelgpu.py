@@ -27,7 +27,6 @@ class SinusoidalPositionEncoder(torch.nn.Module):
         batch_size = positions.size(0)
         positions = positions.type(dtype)
         device = positions.device
-        print('驱动版本',positions)
         log_timescale_increment = torch.log(torch.tensor([10000], dtype=dtype, device=device)) / (
             depth / 2 - 1
         )
@@ -125,9 +124,11 @@ class MultiHeadedAttentionSANM(nn.Module):
         b, t, d = inputs.size()
         if mask is not None:
             mask = torch.reshape(mask, (b, -1, 1))
+            if mask_shfit_chunk is not None:
+                mask = mask * mask_shfit_chunk
+            inputs = inputs * mask
             print(f"inputs shape: {inputs.shape}")
             print(f"mask shape: {mask.shape}")
-            inputs = inputs * mask
 
         x = inputs.transpose(1, 2)
         x = self.pad_fn(x)
@@ -228,7 +229,6 @@ class MultiHeadedAttentionSANM(nn.Module):
 
         """
         q_h, k_h, v_h, v = self.forward_qkv(x)
-        print(f"mask shape 2: {mask.shape}")
         fsmn_memory = self.forward_fsmn(v, mask, mask_shfit_chunk)
         q_h = q_h * self.d_k ** (-0.5)
         scores = torch.matmul(q_h, k_h.transpose(-2, -1))
@@ -292,16 +292,12 @@ class LayerNorm(nn.LayerNorm):
 
 def sequence_mask(lengths, maxlen=None, dtype=torch.float32, device=None):
     if maxlen is None:
-        maxlen = lengths.max
-    print(f"maxlen: {maxlen}")
-    print(f"maxlen: {lengths}")
+        maxlen = lengths.max()
     row_vector = torch.arange(0, maxlen, 1).to(lengths.device)
     matrix = torch.unsqueeze(lengths, dim=-1)
-    print(f"maxlen: {matrix}")
     mask = row_vector < matrix
-    print(f"mask sequence_mask 1: {mask.shape}")
     mask = mask.detach()
-    print(f"mask sequence_mask 2: {mask.shape}")
+
     return mask.type(dtype).to(device) if device is not None else mask.type(dtype)
 
 
@@ -751,8 +747,7 @@ class SenseVoiceSmall(nn.Module):
 
         event_emo_query = self.embed(torch.LongTensor([[1, 2]]).to(speech.device)).repeat(speech.size(0), 1, 1)
         input_query = torch.cat((language_query, event_emo_query), dim=1)
-        input_quer = input_query
-        speech = torch.cat((input_quer, speech), dim=1)
+        speech = torch.cat((input_query, speech), dim=1)
         speech_lengths += 3
 
         encoder_out, encoder_out_lens = self.encoder(speech, speech_lengths)
@@ -838,7 +833,7 @@ class SenseVoiceSmall(nn.Module):
         speech_lengths = speech_lengths.to(device=kwargs["device"])
 
         language = kwargs.get("language", "auto")
-        language_query = self.embed(    
+        language_query = self.embed(
             torch.LongTensor(
                 [[self.lid_dict[language] if language in self.lid_dict else 0]]
             ).to(speech.device)
@@ -852,6 +847,7 @@ class SenseVoiceSmall(nn.Module):
             torch.LongTensor([[self.textnorm_dict[textnorm]]]).to(speech.device)
         ).repeat(speech.size(0), 1, 1)
         speech = torch.cat((textnorm_query, speech), dim=1)
+        speech_lengths += 1
 
         event_emo_query = self.embed(torch.LongTensor([[1, 2]]).to(speech.device)).repeat(
             speech.size(0), 1, 1
