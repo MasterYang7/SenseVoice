@@ -46,7 +46,7 @@ class SinusoidalPositionEncoder(torch.nn.Module):
     def forward(self, x):
         batch_size, timesteps, input_dim = x.size()
         positions = torch.arange(1, timesteps + 1, device=x.device)[None, :]
-        position_encoding = self.encode(positions, input_dim, x.dtype).to(x.device)
+        position_encoding = self.encode(positions.to('npu'), input_dim, x.dtype).to(x.device)
 
         return x + position_encoding
 
