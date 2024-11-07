@@ -128,8 +128,7 @@ class MultiHeadedAttentionSANM(nn.Module):
             mask = torch.reshape(mask, (b, -1, 1))
             if mask_shfit_chunk is not None:
                 mask = mask * mask_shfit_chunk
-            print(f"inputs shape: {inputs.shape}")
-            print(f"mask shape: {mask.shape}")
+           
             if inputs.shape[1] > mask.shape[1]:
             # 填充 mask 使其与 inputs 一致
                 mask = F.pad(mask, (0, inputs.shape[1] - mask.shape[1]), value=0)
@@ -144,6 +143,9 @@ class MultiHeadedAttentionSANM(nn.Module):
             elif inputs.shape[2] < mask.shape[2]:
                 # 填充 inputs 使其与 mask 一致
                 inputs = F.pad(inputs, (0, mask.shape[2] - inputs.shape[2]), value=0)
+
+            print(f"inputs shape: {inputs.shape}")
+            print(f"mask shape: {mask.shape}")
             inputs = inputs * mask
 
         x = inputs.transpose(1, 2)
