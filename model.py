@@ -39,7 +39,7 @@ class SinusoidalPositionEncoder(torch.nn.Module):
         inv_timescales = torch.reshape(inv_timescales, [batch_size, -1])
         scaled_time = torch.reshape(positions, [1, -1, 1]) * torch.reshape(
             inv_timescales, [1, 1, -1]
-        )
+        ).to('npu')
         encoding = torch.cat([torch.sin(scaled_time), torch.cos(scaled_time)], dim=2)
         return encoding.type(dtype)
 
