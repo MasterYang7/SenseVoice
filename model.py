@@ -131,7 +131,7 @@ class MultiHeadedAttentionSANM(nn.Module):
            
             if inputs.shape[1] > mask.shape[1]:
             # 填充 mask 使其与 inputs 一致
-                mask = F.pad(mask, (0, inputs.shape[1] - mask.shape[1]), value=0)
+                mask = F.pad(mask, (1, inputs.shape[1] - mask.shape[1]), value=0)
                 
             elif inputs.shape[1] < mask.shape[1]:
                 # 填充 inputs 使其与 mask 一致
