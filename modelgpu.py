@@ -127,8 +127,8 @@ class MultiHeadedAttentionSANM(nn.Module):
             if mask_shfit_chunk is not None:
                 mask = mask * mask_shfit_chunk
             inputs = inputs * mask
-            print(f"inputs shape: {inputs.shape}")
-            print(f"mask shape: {mask.shape}")
+            print(f"inputs shape: {inputs}")
+            print(f"mask shape: {mask}")
 
         x = inputs.transpose(1, 2)
         x = self.pad_fn(x)
@@ -136,10 +136,10 @@ class MultiHeadedAttentionSANM(nn.Module):
         x = x.transpose(1, 2)
         x += inputs
         x = self.dropout(x)
-        print(f"x shape: {x.shape}")
+        print(f"x shape: {x}")
         if mask is not None:
             x = x * mask
-            print(f"xxx shape: {x.shape}")
+            print(f"xxx shape: {x}")
         end_time = time.perf_counter()
 
         # 计算运行时间
