@@ -240,11 +240,11 @@ class MultiHeadedAttentionSANM(nn.Module):
         q_h, k_h, v_h, v = self.forward_qkv(x.to(device))
         fsmn_memory = self.forward_fsmn(v, mask.to(device), mask_shfit_chunk.to(device))
         q_h = q_h * self.d_k ** (-0.5)
-        scores = torch.matmul(q_h, k_h.transpose(-2, -1))
-        att_outs = self.forward_attention(v_h, scores, mask.to(device), mask_shfit_chunk.to(device))
+        scores = torch.matmul(q_h, k_h.transpose(-2, -1).to(device))
+        att_outs = self.forward_attention(v_h, scores.to(device), mask.to(device), mask_shfit_chunk.to(device))
         print(f"1 device: {att_outs.device}")
         print(f"2 device: {fsmn_memory.device}")
-        return att_outs.to(device) + fsmn_memory.to(device)
+        return att_outs + fsmn_memory
 
     def forward_chunk(self, x, cache=None, chunk_size=None, look_back=0):
         """Compute scaled dot product attention.
