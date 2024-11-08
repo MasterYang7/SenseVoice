@@ -238,9 +238,12 @@ class MultiHeadedAttentionSANM(nn.Module):
         """
         device = torch.device("npu:0")
         q_h, k_h, v_h, v = self.forward_qkv(x.to(device))
+        print(f"0 device: {000}")
         fsmn_memory = self.forward_fsmn(v, mask.to(device), mask_shfit_chunk.to(device))
         q_h = q_h * self.d_k ** (-0.5)
+        print(f"1 device: {100}")
         scores = torch.matmul(q_h, k_h.transpose(-2, -1).to(device))
+        print(f"2 device: {200}")
         att_outs = self.forward_attention(v_h, scores.to(device), mask.to(device), mask_shfit_chunk.to(device))
         print(f"1 device: {att_outs.device}")
         print(f"2 device: {fsmn_memory.device}")
