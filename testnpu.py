@@ -21,5 +21,10 @@ def test_npu():
     print(f"代码运行时间: {execution_time} 秒")
 if __name__ == "__main__": 
     test_cpu() 
+    start_time = time.perf_counter()
     torch_npu.npu.set_device("npu:0") 
+    end_time = time.perf_counter()
+    # 计算运行时间
+    execution_time = end_time - start_time
+    print(f"代码运行时间: {execution_time} 秒")
     test_npu()
