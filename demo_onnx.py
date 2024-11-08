@@ -7,7 +7,6 @@ from pathlib import Path
 import time
 from funasr_onnx import SenseVoiceSmall
 from funasr_onnx.utils.postprocess_utils import rich_transcription_postprocess
-
 start_time = time.perf_counter()
 model_dir = "iic/SenseVoiceSmall"
 

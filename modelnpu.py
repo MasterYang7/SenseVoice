@@ -121,7 +121,7 @@ class MultiHeadedAttentionSANM(nn.Module):
         self.pad_fn = nn.ConstantPad1d((left_padding, right_padding), 0.0)
 
     def forward_fsmn(self, inputs, mask, mask_shfit_chunk=None):
-        device = torch.device("npu:0") if torch.npu.is_available() else torch.device("cpu")
+        device = torch.device("npu:0")
         print(device)
         start_time = time.perf_counter()
         b, t, d = inputs.size()
@@ -166,7 +166,7 @@ class MultiHeadedAttentionSANM(nn.Module):
             torch.Tensor: Transformed value tensor (#batch, n_head, time2, d_k).
 
         """
-        device = torch.device("npu:0") if torch.npu.is_available() else torch.device("cpu")
+        device = torch.device("npu:0")
         b, t, d = x.to(device).size()
         q_k_v = self.linear_q_k_v(x)
         q, k, v = torch.split(q_k_v, int(self.h * self.d_k), dim=-1)
@@ -195,7 +195,7 @@ class MultiHeadedAttentionSANM(nn.Module):
                 weighted by the attention score (#batch, time1, time2).
 
         """
-        device = torch.device("npu:0") if torch.npu.is_available() else torch.device("cpu")
+        device = torch.device("npu:0")
         n_batch = value.to(device).size(0)
         if mask is not None:
             if mask_att_chunk_encoder is not None:
@@ -235,7 +235,7 @@ class MultiHeadedAttentionSANM(nn.Module):
             torch.Tensor: Output tensor (#batch, time1, d_model).
 
         """
-        device = torch.device("npu:0") if torch.npu.is_available() else torch.device("cpu")
+        device = torch.device("npu:0")
         q_h, k_h, v_h, v = self.forward_qkv(x.to(device))
         fsmn_memory = self.forward_fsmn(v, mask.to(device), mask_shfit_chunk.to(device))
         q_h = q_h * self.d_k ** (-0.5)
@@ -257,7 +257,7 @@ class MultiHeadedAttentionSANM(nn.Module):
             torch.Tensor: Output tensor (#batch, time1, d_model).
 
         """
-        device = torch.device("npu:0") if torch.npu.is_available() else torch.device("cpu")
+        device = torch.device("npu:0")
         q_h, k_h, v_h, v = self.forward_qkv(x)
         if chunk_size is not None and look_back > 0 or look_back == -1:
             if cache is not None:
@@ -351,7 +351,7 @@ class EncoderLayerSANM(nn.Module):
             torch.Tensor: Mask tensor (#batch, time).
 
         """
-        device = torch.device("npu:0") if torch.npu.is_available() else torch.device("cpu")
+        device = torch.device("npu:0")
         mask = mask.to(device)
         x = x.to(device)
         skip_layer = False
@@ -571,7 +571,7 @@ class SenseVoiceEncoderSmall(nn.Module):
         ilens: torch.Tensor,
     ):
         """Embed positions in tensor."""
-        device = torch.device("npu:0") if torch.npu.is_available() else torch.device("cpu")
+        device = torch.device("npu:0")
         masks = sequence_mask(ilens, device=device)[:, None, :]
 
         xs_pad *= self.output_size() ** 0.5
@@ -811,7 +811,7 @@ class SenseVoiceSmall(nn.Module):
         **kwargs,
     ):
     
-        device = torch.device("npu:0") if torch.npu.is_available() else torch.device("cpu")
+        device = torch.device("npu:0")
         meta_data = {}
         if (
             isinstance(data_in, torch.Tensor) and kwargs.get("data_type", "sound") == "fbank"
