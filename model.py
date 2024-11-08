@@ -160,7 +160,6 @@ class MultiHeadedAttentionSANM(nn.Module):
             x = x * mask
             print(f"xxx shape: {x.shape}")
         end_time = time.perf_counter()
-
         # 计算运行时间
         execution_time = end_time - start_time
         print(f"代码运行时间: {execution_time} 秒")
