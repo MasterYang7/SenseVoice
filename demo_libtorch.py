@@ -10,7 +10,7 @@ from funasr_torch.utils.postprocess_utils import rich_transcription_postprocess
 
 model_dir = "iic/SenseVoiceSmall"
 
-model = SenseVoiceSmall(model_dir, batch_size=10, device="cuda:0")
+model = SenseVoiceSmall(model_dir, batch_size=10, device="npu:0")
 
 wav_or_scp = ["{}/.cache/modelscope/hub/{}/example/en.mp3".format(Path.home(), model_dir)]
 

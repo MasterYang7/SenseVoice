@@ -11,7 +11,7 @@ from funasr_onnx.utils.postprocess_utils import rich_transcription_postprocess
 start_time = time.perf_counter()
 model_dir = "iic/SenseVoiceSmall"
 
-model = SenseVoiceSmall(model_dir, batch_size=10, quantize=True)
+model = SenseVoiceSmall(model_dir, batch_size=10, quantize=True,device="npu:0")
 
 # inference
 #wav_or_scp = ["{}/.cache/modelscope/hub/{}/example/en.mp3".format(Path.home(), model_dir)]
