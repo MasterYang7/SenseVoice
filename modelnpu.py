@@ -97,6 +97,7 @@ class MultiHeadedAttentionSANM(nn.Module):
     ):
         """Construct an MultiHeadedAttention object."""
         super().__init__()
+        device = torch.device("npu:0")
         assert n_feat % n_head == 0
         # We assume d_v always equals d_k
         self.d_k = n_feat // n_head
@@ -112,7 +113,7 @@ class MultiHeadedAttentionSANM(nn.Module):
 
         self.fsmn_block = nn.Conv1d(
             n_feat, n_feat, kernel_size, stride=1, padding=0, groups=n_feat, bias=False
-        )
+        ).to(device)
         # padding
         left_padding = (kernel_size - 1) // 2
         if sanm_shfit > 0:
