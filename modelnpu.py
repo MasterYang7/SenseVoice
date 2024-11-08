@@ -859,7 +859,7 @@ class SenseVoiceSmall(nn.Module):
         ).repeat(speech.size(0), 1, 1)
         speech = torch.cat((textnorm_query, speech), dim=1)
         speech_lengths += 1
-
+        print(f"inputs device: {speech.device}")
         event_emo_query = self.embed(torch.LongTensor([[1, 2]]).to(speech.device)).repeat(
             speech.size(0), 1, 1
         )
