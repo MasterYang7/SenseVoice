@@ -808,8 +808,8 @@ class SenseVoiceSmall(nn.Module):
         frontend=None,
         **kwargs,
     ):
-
-
+    
+        device = torch.device("npu:0") if torch.npu.is_available() else torch.device("cpu")
         meta_data = {}
         if (
             isinstance(data_in, torch.Tensor) and kwargs.get("data_type", "sound") == "fbank"
@@ -840,8 +840,8 @@ class SenseVoiceSmall(nn.Module):
                 speech_lengths.sum().item() * frontend.frame_shift * frontend.lfr_n / 1000
             )
 
-        speech = speech.to(device=kwargs["device"])
-        speech_lengths = speech_lengths.to(device=kwargs["device"])
+        speech = speech.to(device=device)
+        speech_lengths = speech_lengths.to(device=device)
 
         language = kwargs.get("language", "auto")
         language_query = self.embed(
