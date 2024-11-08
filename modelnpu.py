@@ -122,6 +122,7 @@ class MultiHeadedAttentionSANM(nn.Module):
 
     def forward_fsmn(self, inputs, mask, mask_shfit_chunk=None):
         device = torch.device("npu:0") if torch.npu.is_available() else torch.device("cpu")
+        print(device)
         start_time = time.perf_counter()
         b, t, d = inputs.size()
         inputs = inputs.to(device)
