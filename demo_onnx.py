@@ -4,6 +4,7 @@
 #  MIT License  (https://opensource.org/licenses/MIT)
 
 from pathlib import Path
+import time
 from funasr_onnx import SenseVoiceSmall
 from funasr_onnx.utils.postprocess_utils import rich_transcription_postprocess
 
