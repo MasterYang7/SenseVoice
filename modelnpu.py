@@ -236,6 +236,9 @@ class MultiHeadedAttentionSANM(nn.Module):
             torch.Tensor: Output tensor (#batch, time1, d_model).
 
         """
+        x = x.float()
+        mask = mask.float()
+        mask_shfit_chunk = mask_shfit_chunk.float()
         device = torch.device("npu:0")
         q_h, k_h, v_h, v = self.forward_qkv(x.to(device))
         print(f"0 device: {000}")
