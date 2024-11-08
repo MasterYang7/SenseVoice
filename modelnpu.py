@@ -241,7 +241,7 @@ class MultiHeadedAttentionSANM(nn.Module):
         fsmn_memory = self.forward_fsmn(v, mask.to(device), mask_shfit_chunk.to(device))
         q_h = q_h * self.d_k ** (-0.5)
         scores = torch.matmul(q_h, k_h.transpose(-2, -1))
-        att_outs = self.forward_attention(v_h, scores, mask, mask_att_chunk_encoder)
+        att_outs = self.forward_attention(v_h, scores, mask.to(device), mask_shfit_chunk.to(device))
         return att_outs + fsmn_memory
 
     def forward_chunk(self, x, cache=None, chunk_size=None, look_back=0):
