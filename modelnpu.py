@@ -1,10 +1,11 @@
 
 import time
 import torch
+import torch_npu
 from torch import nn
 import torch.nn.functional as F
 from typing import Iterable, Optional
-
+torch_npu.npu.set_compile_mode(jit_compile=False)
 from funasr.register import tables
 from funasr.models.ctc.ctc import CTC
 from funasr.utils.datadir_writer import DatadirWriter
