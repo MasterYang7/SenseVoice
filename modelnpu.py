@@ -164,7 +164,8 @@ class MultiHeadedAttentionSANM(nn.Module):
             torch.Tensor: Transformed value tensor (#batch, n_head, time2, d_k).
 
         """
-        b, t, d = x.size()
+        device = torch.device("npu:0") if torch.npu.is_available() else torch.device("cpu")
+        b, t, d = x.to(device).size()
         q_k_v = self.linear_q_k_v(x)
         q, k, v = torch.split(q_k_v, int(self.h * self.d_k), dim=-1)
         q_h = torch.reshape(q, (b, t, self.h, self.d_k)).transpose(
@@ -192,10 +193,11 @@ class MultiHeadedAttentionSANM(nn.Module):
                 weighted by the attention score (#batch, time1, time2).
 
         """
-        n_batch = value.size(0)
+        device = torch.device("npu:0") if torch.npu.is_available() else torch.device("cpu")
+        n_batch = value.to(device).size(0)
         if mask is not None:
             if mask_att_chunk_encoder is not None:
-                mask = mask * mask_att_chunk_encoder
+                mask = mask.to(device) * mask_att_chunk_encoder.to(device)
 
             mask = mask.unsqueeze(1).eq(0)  # (batch, 1, *, time2)
 
@@ -231,8 +233,9 @@ class MultiHeadedAttentionSANM(nn.Module):
             torch.Tensor: Output tensor (#batch, time1, d_model).
 
         """
-        q_h, k_h, v_h, v = self.forward_qkv(x)
-        fsmn_memory = self.forward_fsmn(v, mask, mask_shfit_chunk)
+        device = torch.device("npu:0") if torch.npu.is_available() else torch.device("cpu")
+        q_h, k_h, v_h, v = self.forward_qkv(x.to(device))
+        fsmn_memory = self.forward_fsmn(v, mask.to(device), mask_shfit_chunk.to(device))
         q_h = q_h * self.d_k ** (-0.5)
         scores = torch.matmul(q_h, k_h.transpose(-2, -1))
         att_outs = self.forward_attention(v_h, scores, mask, mask_att_chunk_encoder)
@@ -252,6 +255,7 @@ class MultiHeadedAttentionSANM(nn.Module):
             torch.Tensor: Output tensor (#batch, time1, d_model).
 
         """
+        device = torch.device("npu:0") if torch.npu.is_available() else torch.device("cpu")
         q_h, k_h, v_h, v = self.forward_qkv(x)
         if chunk_size is not None and look_back > 0 or look_back == -1:
             if cache is not None:
