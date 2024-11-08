@@ -864,7 +864,7 @@ class SenseVoiceSmall(nn.Module):
             speech.size(0), 1, 1
         )
         input_query = torch.cat((language_query, event_emo_query), dim=1)
-        speech = torch.cat((input_query, speech), dim=1)
+        speech = torch.cat((input_query, speech), dim=1).to(speech.device)
         speech_lengths += 3
 
         # Encoder
