@@ -135,7 +135,7 @@ class MultiHeadedAttentionSANM(nn.Module):
             print(f"mask shape: {mask}")
 
         x = inputs.transpose(1, 2).to(device)
-        x = self.pad_fn(x)
+        x = self.pad_fn(x.to(device))
         x = self.fsmn_block(x)
         x = x.transpose(1, 2)
         x += inputs
