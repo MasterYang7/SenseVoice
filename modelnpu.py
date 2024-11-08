@@ -136,7 +136,7 @@ class MultiHeadedAttentionSANM(nn.Module):
 
         x = inputs.transpose(1, 2).to(device)
         x = self.pad_fn(x.to(device))
-        x = self.fsmn_block(x)
+        x = self.fsmn_block(x.to(device))
         x = x.transpose(1, 2)
         x += inputs
         x = self.dropout(x)
